@@ -52,7 +52,7 @@ jobs:
           -S ${{ github.workspace }}/extern/OasisC
     
       - name: Build
-        run: source "/home/runner/work/webapp/webapp/emsdk/emsdk_env.sh" && emmake cmake --build cmake-build-web
+        run: source "/home/runner/work/webapp/webapp/emsdk/emsdk_env.sh" && emmake cmake --build cmake-build-web --target OasisC
 
       - name: Copy WebAssembly
         run: cp cmake-build-web/OasisC.mjs src/
