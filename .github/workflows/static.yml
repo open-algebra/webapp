@@ -48,7 +48,7 @@ jobs:
           emcmake cmake -B cmake-build-web
           -D OASIS_BUILD_PARANOID=OFF
           -D OASIS_BUILD_TESTS=OFF
-          -D OASIS_BUILD_EXTRA=OFF
+          -D OASIS_BUILD_EXTRAS=ON
           -S ${{ github.workspace }}/extern/OasisC
     
       - name: Build
