@@ -1,0 +1,3 @@
+[submodule "extern/OasisC"]
+	path = extern/OasisC
+	url = https://github.com/open-algebra/OasisC.git
