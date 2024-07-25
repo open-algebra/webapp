@@ -1,5 +1,4 @@
 import './App.css'
-import OasisC from './OasisC.mjs'
 import {Alert, Button, Container, Form, InputGroup, Modal, Spinner, Stack} from "react-bootstrap";
 import {FormEvent, useEffect, useRef, useState} from "react";
 
@@ -50,8 +49,9 @@ function App() {
 
     useEffect(() => {
         async function loadOasis() {
-            const module = await OasisC();
-            setOasis(module);
+            const module = await import('./OasisC.mjs')
+            const wasm = await module.default();
+            setOasis(wasm);
         }
 
         loadOasis().then();
