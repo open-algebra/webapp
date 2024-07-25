@@ -42,17 +42,18 @@ jobs:
 
       - name: Configure CMake
         run: >
-          ./${{ github.workspace }}/emsdk/upstream/emcmake cmake -B cmake-build-web
+          source "/home/runner/work/webapp/webapp/emsdk/emsdk_env.sh" &&
+          emcmake cmake -B cmake-build-web
           -D OASIS_BUILD_PARANOID=OFF
           -D OASIS_BUILD_TESTS=OFF
           -D OASIS_BUILD_EXTRA=OFF
           -S ${{ github.workspace }}/extern/OasisC
+    
+      - name: Build
+        run: source "/home/runner/work/webapp/webapp/emsdk/emsdk_env.sh" && .${{ github.workspace }}/emsdk/upstream/emscripten/emmake cmake --build cmake-build-web
 
       - name: Copy WebAssembly
         run: cp cmake-build-web/OasisC.mjs src/
-    
-      - name: Build
-        run: ./${{ github.workspace }}/emsdk/upstream/emmake cmake --build cmake-build-web
         
       - name: Set up Node
         uses: actions/setup-node@v3
