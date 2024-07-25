@@ -5,6 +5,7 @@ import {FormEvent, useEffect, useRef, useState} from "react";
 interface HistoryEntry {
     query: string,
     response: string
+    error: boolean
 }
 
 interface AppState {
@@ -19,7 +20,11 @@ function App() {
     const [showHelp, setShowHelp] = useState(false);
 
     function addToHistory(query: string, response: string) {
-        setAppState({history: [...appState.history, {query, response}], currentEntry: 0});
+        setAppState({...appState, history: [...appState.history, {query, response, error: false}], currentEntry: 0});
+    }
+
+    function addErrorToHistory(query: string, response: string) {
+        setAppState({...appState, history: [...appState.history, {query, response, error: true}], currentEntry: 0});
     }
 
     function setCurrentEntry(input: string) {
@@ -33,17 +38,23 @@ function App() {
     function onEntry(e: FormEvent) {
         e.preventDefault();
 
-        if (inputRef.current) {
-            inputRef.current.value = '';
-        }
-
         if (!oasis || !appState.currentEntry) return;
 
         const queryStr = oasis.ccall('Oa_ExpressionToMathMLStr', 'string', ['number'], [appState.currentEntry])
 
-        const result = oasis.ccall('Oa_SimplifyNF', 'number', ['number'], [appState.currentEntry]);
-        const resultStr = oasis.ccall('Oa_ExpressionToMathMLStr', 'string', ['number'], [result])
+        if (inputRef.current) {
+            inputRef.current.value = '';
+        }
 
+        let result;
+        try {
+            result = oasis.ccall('Oa_SimplifyNF', 'number', ['number'], [appState.currentEntry]);
+        } catch (error) {
+            addErrorToHistory(queryStr, (error as Error).message)
+            return;
+        }
+
+        const resultStr = oasis.ccall('Oa_ExpressionToMathMLStr', 'string', ['number'], [result])
         addToHistory(queryStr, resultStr);
     }
 
@@ -76,7 +87,8 @@ function App() {
                 <Modal.Body>
                     <div className={"pb-3"}>
                         Welcome to OASIS! To get started, type in any expression such as "2x+3x". Oasis automatically
-                        recognizes the variables and is able to add them for you. Some variable names are reserved, such as
+                        recognizes the variables and is able to add them for you. Some variable names are reserved, such
+                        as
                         "i" for imaginary numbers.
                     </div>
                     <h5>Functions</h5>
@@ -102,23 +114,29 @@ function App() {
                     <Container>
                         <Stack gap={3}>
                             <Alert variant={"warning"}>Oasis, OasisC, and Oasis Web are still under active development.
-                                Here be dragons.</Alert>
-                            {appState.history.map(({query, response}, index) => (
+                                Here be dragons. If something does not work please feel free to <Alert.Link
+                                    href={"https://github.com/open-algebra/Oasis/issues/new/choose"}>file an
+                                    issue</Alert.Link>!</Alert>
+                            {appState.history.map(({query, response, error}, index) => (
                                 <Stack gap={3} key={index}>
-                                    <div className={"align-self-end bg-secondary-subtle rounded-5 p-3"}>
+                                    <div className={"align-self-end bg-primary-subtle rounded-5 p-3"}>
                                         <math display={"block"}
                                               dangerouslySetInnerHTML={{__html: query}}></math>
                                     </div>
-                                    <div className={"align-self-start bg-primary-subtle rounded-5 p-3"}>
-                                        <math display={"block"}
-                                              dangerouslySetInnerHTML={{__html: response}}></math>
-                                    </div>
+                                    {error
+                                        ? <div className={"align-self-start bg-danger-subtle rounded-5 p-3"}>
+                                            <strong>Error:</strong> {response}
+                                        </div>
+                                        : <div className={"align-self-start bg-secondary-subtle rounded-5 p-3"}>
+                                            <math display={"block"}
+                                                  dangerouslySetInnerHTML={{__html: response}}></math>
+                                        </div>}
                                 </Stack>
                             ))}
                             {
-                                (appState.currentEntry && oasis) === 0
+                                !(appState.currentEntry && oasis)
                                     ? null
-                                    : <div className={"align-self-end bg-secondary-subtle rounded-5 p-3"}>
+                                    : <div className={"align-self-end bg-primary-subtle rounded-5 p-3"}>
                                         <math display={"block"}
                                               dangerouslySetInnerHTML={{__html: oasis.ccall('Oa_ExpressionToMathMLStr', 'string', ['number'], [appState.currentEntry])}}></math>
                                     </div>
@@ -126,13 +144,14 @@ function App() {
                         </Stack>
                     </Container>
                 </div>
-                <div className={"sticky-bottom shadow"}>
+                <div className={"sticky-bottom bg-body shadow"}>
                     <Container>
                         <Form className={"my-3"} onSubmit={onEntry}>
-                            <InputGroup>
+                            <InputGroup hasValidation>
                                 <Form.Control
                                     ref={inputRef}
                                     placeholder="Enter an expression..."
+                                    isInvalid={appState.currentEntry === 0 && !!inputRef.current?.value}
                                     onChange={() => {
                                         inputRef.current?.value && setCurrentEntry(inputRef.current?.value)
                                     }}
@@ -140,7 +159,10 @@ function App() {
                                 <Button
                                     variant="primary"
                                     type={"submit"}
+                                    disabled={!appState.currentEntry}
                                 >Submit</Button>
+                                <Form.Control.Feedback type={"invalid"}>Failed to parse
+                                    expression</Form.Control.Feedback>
                             </InputGroup>
                         </Form>
                     </Container>
