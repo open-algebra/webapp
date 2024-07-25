@@ -42,7 +42,7 @@ jobs:
 
       - name: Configure CMake
         run: >
-          emcmake cmake -B cmake-build-web
+          ./${{ github.workspace }}/emsdk/upstream/emscripten/emcmake cmake -B cmake-build-web
           -D OASIS_BUILD_PARANOID=OFF
           -D OASIS_BUILD_TESTS=OFF
           -D OASIS_BUILD_EXTRA=OFF
@@ -52,7 +52,7 @@ jobs:
         run: cp cmake-build-web/OasisC.mjs src/
     
       - name: Build
-        run: emmake cmake --build cmake-build-web
+        run: ./${{ github.workspace }}/emsdk/upstream/emscripten/emmake cmake --build cmake-build-web
         
       - name: Set up Node
         uses: actions/setup-node@v3
