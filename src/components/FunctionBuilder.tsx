@@ -40,6 +40,10 @@ export default function FunctionBuilder({
 
         const preprocessedInput = oasis.ccall('Oa_PreProcessInFix', 'string', ['string'], [composedFunction]);
         const expression = oasis.ccall('Oa_FromInFix', 'number', ['string'], [preprocessedInput]);
+
+        if (currentEntry) {
+            oasis.ccall('Oa_Free','void', ['number'], [currentEntry]);
+        }
         setCurrentEntry(expression)
     }
 

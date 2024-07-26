@@ -41,6 +41,10 @@ function App() {
     function parseInput() {
         if (!oasis || !inputRef.current?.value) return;
 
+        if (appState.currentEntry) {
+            oasis.ccall('Oa_Free','void', ['number'], [appState.currentEntry]);
+        }
+
         const preprocessedInput = oasis.ccall('Oa_PreProcessInFix', 'string', ['string'], [inputRef.current?.value]);
         const expression = oasis.ccall('Oa_FromInFix', 'number', ['string'], [preprocessedInput]);
         setAppState({...appState, currentEntry: expression})
@@ -70,6 +74,10 @@ function App() {
         }
 
         const resultStr = oasis.ccall('Oa_ExpressionToMathMLStr', 'string', ['number'], [result])
+
+        oasis.ccall('Oa_Free','void', ['number'], [result]);
+        oasis.ccall('Oa_Free','void', ['number'], [appState.currentEntry]);
+
         addToHistory(queryStr, resultStr);
     }
 
