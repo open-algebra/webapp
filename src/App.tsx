@@ -1,6 +1,7 @@
 import './App.css'
 import {Alert, Button, Container, Form, InputGroup, Modal, Spinner, Stack} from "react-bootstrap";
 import {FormEvent, useEffect, useRef, useState} from "react";
+import FunctionBuilder from "./components/FunctionBuilder.tsx";
 
 interface HistoryEntry {
     query: string,
@@ -10,10 +11,8 @@ interface HistoryEntry {
 
 interface AppState {
     history: HistoryEntry[]
-    currentEntry: number
+    currentEntry: number,
 }
-
-type FunctionBuilderState = 'dd' | 'in' | 'log' | null
 
 function App() {
     const inputRef = useRef<HTMLInputElement>(null);
@@ -21,6 +20,9 @@ function App() {
     const [oasis, setOasis] = useState(null);
     const [appState, setAppState] = useState<AppState>({history: [], currentEntry: 0});
     const [showHelp, setShowHelp] = useState(false);
+    const [showDerivativeBuilder, setShowDerivativeBuilder] = useState(false);
+    const [showIntegralBuilder, setShowIntegralBuilder] = useState(false);
+    const [showLogBuilder, setShowLogBuilder] = useState(false);
 
     function addToHistory(query: string, response: string) {
         setAppState({...appState, history: [...appState.history, {query, response, error: false}], currentEntry: 0});
@@ -30,15 +32,25 @@ function App() {
         setAppState({...appState, history: [...appState.history, {query, response, error: true}], currentEntry: 0});
     }
 
-    function setCurrentEntry(input: string) {
-        if (!oasis) return;
+    function appendToInput(addition: string) {
+        if (!inputRef.current) return;
+        inputRef.current.value += (inputRef.current.value === '' ? '' : ' ') + addition;
+        parseInput()
+    }
 
-        const preprocessedInput = oasis.ccall('Oa_PreProcessInFix', 'string', ['string'], [input]);
+    function parseInput() {
+        if (!oasis || !inputRef.current?.value) return;
+
+        const preprocessedInput = oasis.ccall('Oa_PreProcessInFix', 'string', ['string'], [inputRef.current?.value]);
         const expression = oasis.ccall('Oa_FromInFix', 'number', ['string'], [preprocessedInput]);
         setAppState({...appState, currentEntry: expression})
     }
 
-    function onEntry(e: FormEvent) {
+    function closeHelp() {
+        setShowHelp(false)
+    }
+
+    function onSubmit(e: FormEvent) {
         e.preventDefault();
 
         if (!oasis || !appState.currentEntry) return;
@@ -81,12 +93,20 @@ function App() {
         )
     }
 
-    function closeHelp() {
-        setShowHelp(false)
-    }
-
     return (
         <>
+            <FunctionBuilder title={"Derivative Builder"} func={"dd"} firstArgLabel={"Argument"}
+                             secondArgLabel={"Variable"} show={showDerivativeBuilder}
+                             setShow={setShowDerivativeBuilder}
+                             setResult={appendToInput} oasis={oasis}/>
+            <FunctionBuilder title={"Integral Builder"} func={"in"} firstArgLabel={"Argument"}
+                             secondArgLabel={"Variable"} show={showIntegralBuilder}
+                             setShow={setShowIntegralBuilder}
+                             setResult={appendToInput} oasis={oasis}/>
+            <FunctionBuilder title={"Logarithm Builder"} func={"log"} firstArgLabel={"Base"}
+                             secondArgLabel={"Argument"} show={showLogBuilder}
+                             setShow={setShowLogBuilder}
+                             setResult={appendToInput} oasis={oasis}/>
             <Modal show={showHelp} onHide={closeHelp}>
                 <Modal.Header closeButton>
                     <Modal.Title>Help</Modal.Title>
@@ -150,30 +170,35 @@ function App() {
                     </Container>
                 </div>
                 <div className={"bg-body shadow"}>
-                    <Container>
-                        <Form className={"my-3"} onSubmit={onEntry}>
-                            <InputGroup hasValidation>
-                                <Form.Control
-                                    ref={inputRef}
-                                    placeholder="Enter an expression..."
-                                    isInvalid={appState.currentEntry === 0 && !!inputRef.current?.value}
-                                    onChange={() => {
-                                        inputRef.current?.value && setCurrentEntry(inputRef.current?.value)
-                                    }}
-                                />
-                                <Button
-                                    variant="primary"
-                                    type={"submit"}
-                                    disabled={!appState.currentEntry}
-                                >Submit</Button>
-                                <Form.Control.Feedback type={"invalid"}>Failed to parse
-                                    expression</Form.Control.Feedback>
-                            </InputGroup>
-                        </Form>
+                    <Container className={"my-3"}>
+                        <Stack gap={2}>
+                            <Stack direction={"horizontal"} gap={2}>
+                                <Button variant={"light"} className={"border"} onClick={() => setShowDerivativeBuilder(true)}>Derivative</Button>
+                                <Button variant={"light"} className={"border"} onClick={() => setShowIntegralBuilder(true)}>Integral</Button>
+                                <Button variant={"light"} className={"border"} onClick={() => setShowLogBuilder(true)}>Logarithm</Button>
+                            </Stack>
+                            <Form onSubmit={onSubmit}>
+                                <InputGroup hasValidation>
+                                    <Form.Control
+                                        ref={inputRef}
+                                        placeholder="Enter an expression..."
+                                        isInvalid={appState.currentEntry === 0 && !!inputRef.current?.value}
+                                        onChange={parseInput}
+                                    />
+                                    <Button
+                                        variant="primary"
+                                        type={"submit"}
+                                        disabled={!appState.currentEntry}
+                                    >Submit</Button>
+                                    <Form.Control.Feedback type={"invalid"}>Failed to parse
+                                        expression</Form.Control.Feedback>
+                                </InputGroup>
+                            </Form>
+                        </Stack>
                     </Container>
                 </div>
             </Stack>
-            <div ref={bottomRef} />
+            <div ref={bottomRef}/>
         </>
     )
 }
