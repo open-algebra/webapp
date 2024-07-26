@@ -13,8 +13,11 @@ interface AppState {
     currentEntry: number
 }
 
+type FunctionBuilderState = 'dd' | 'in' | 'log' | null
+
 function App() {
     const inputRef = useRef<HTMLInputElement>(null);
+    const bottomRef = useRef<HTMLDivElement>(null);
     const [oasis, setOasis] = useState(null);
     const [appState, setAppState] = useState<AppState>({history: [], currentEntry: 0});
     const [showHelp, setShowHelp] = useState(false);
@@ -68,6 +71,10 @@ function App() {
         loadOasis().then();
     }, [])
 
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({behavior: 'smooth'});
+    }, [appState]);
+
     if (!oasis) {
         return (
             <Spinner/>
@@ -98,18 +105,16 @@ function App() {
                     takes the logarithm of 100 with a base of 10.
                 </Modal.Body>
             </Modal>
-            <Stack className={"min-vh-100"}>
-                <div className="bg-body-tertiary border-bottom">
-                    <Container fluid className="text-center py-3">
-                        <h1 className={"fw-semibold"}>OASIS Web</h1>
-                        <p className={"lead"}>Open Algebra Software for Inferring Solutions</p>
-                        <Stack direction="horizontal" gap={2} className="justify-content-center">
-                            <a href={"https://github.com/open-algebra/Oasis"} className={"btn btn-dark"}>GitHub</a>
-                            <Button variant={"light"} onClick={() => setShowHelp(true)}
-                                    className={"border"}>Help</Button>
-                        </Stack>
-                    </Container>
-                </div>
+            <Stack className="min-vh-100">
+                <Container fluid className="text-center py-3">
+                    <h1 className={"fw-semibold"}>OASIS Web</h1>
+                    <p className={"lead"}>Open Algebra Software for Inferring Solutions</p>
+                    <Stack direction="horizontal" gap={2} className="justify-content-center">
+                        <a href={"https://github.com/open-algebra/Oasis"} className={"btn btn-dark"}>GitHub</a>
+                        <Button variant={"light"} onClick={() => setShowHelp(true)}
+                                className={"border"}>Help</Button>
+                    </Stack>
+                </Container>
                 <div className={"flex-grow-1 py-3"}>
                     <Container>
                         <Stack gap={3}>
@@ -144,7 +149,7 @@ function App() {
                         </Stack>
                     </Container>
                 </div>
-                <div className={"sticky-bottom bg-body shadow"}>
+                <div className={"bg-body shadow"}>
                     <Container>
                         <Form className={"my-3"} onSubmit={onEntry}>
                             <InputGroup hasValidation>
@@ -168,6 +173,7 @@ function App() {
                     </Container>
                 </div>
             </Stack>
+            <div ref={bottomRef} />
         </>
     )
 }
