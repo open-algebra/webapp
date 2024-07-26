@@ -114,9 +114,8 @@ function App() {
                 <Modal.Body>
                     <div className={"pb-3"}>
                         Welcome to OASIS! To get started, type in any expression such as "2x+3x". Oasis automatically
-                        recognizes the variables and is able to add them for you. Some variable names are reserved, such
-                        as
-                        "i" for imaginary numbers.
+                        recognizes the variables and is able to add them for you. Some variable names are reserved. For
+                        instance "i" is reserved for imaginary numbers.
                     </div>
                     <h5>Functions</h5>
                     Oasis also understands some functions. For instance, <code>dd(x^2,x)</code> takes derivative of x^2
@@ -139,7 +138,7 @@ function App() {
                     <Container>
                         <Stack gap={3}>
                             <Alert variant={"warning"}>Oasis, OasisC, and Oasis Web are still under active development.
-                                Here be dragons. If something does not work please feel free to <Alert.Link
+                                Here be dragons. If something does not work, please feel free to <Alert.Link
                                     href={"https://github.com/open-algebra/Oasis/issues/new/choose"}>file an
                                     issue</Alert.Link>!</Alert>
                             {appState.history.map(({query, response, error}, index) => (
@@ -169,7 +168,7 @@ function App() {
                         </Stack>
                     </Container>
                 </div>
-                <div className={"bg-body shadow"}>
+                <div className={"bg-body shadow sticky-bottom"}>
                     <Container className={"my-3"}>
                         <Stack gap={2}>
                             <Stack direction={"horizontal"} gap={2}>
