@@ -23,6 +23,8 @@ function App() {
     const [showDerivativeBuilder, setShowDerivativeBuilder] = useState(false);
     const [showIntegralBuilder, setShowIntegralBuilder] = useState(false);
     const [showLogBuilder, setShowLogBuilder] = useState(false);
+    const [showInDevWarning, setShowInDevWarning] = useState(true);
+    const [showCookieDisclosure, setShowCookieDisclosure] = useState(true);
 
     function addToHistory(query: string, response: string) {
         setAppState({...appState, history: [...appState.history, {query, response, error: false}], currentEntry: 0});
@@ -42,7 +44,7 @@ function App() {
         if (!oasis || !inputRef.current?.value) return;
 
         if (appState.currentEntry) {
-            oasis.ccall('Oa_Free','void', ['number'], [appState.currentEntry]);
+            oasis.ccall('Oa_Free', 'void', ['number'], [appState.currentEntry]);
         }
 
         const preprocessedInput = oasis.ccall('Oa_PreProcessInFix', 'string', ['string'], [inputRef.current?.value]);
@@ -75,8 +77,8 @@ function App() {
 
         const resultStr = oasis.ccall('Oa_ExpressionToMathMLStr', 'string', ['number'], [result])
 
-        oasis.ccall('Oa_Free','void', ['number'], [result]);
-        oasis.ccall('Oa_Free','void', ['number'], [appState.currentEntry]);
+        oasis.ccall('Oa_Free', 'void', ['number'], [result]);
+        oasis.ccall('Oa_Free', 'void', ['number'], [appState.currentEntry]);
 
         addToHistory(queryStr, resultStr);
     }
@@ -145,12 +147,23 @@ function App() {
                 <div className={"flex-grow-1 py-3"}>
                     <Container>
                         <Stack gap={3}>
-                            <Alert variant={"warning"}>Oasis, OasisC, and Oasis Web are still under active development.
-                                Here be dragons. If something does not work, please feel free to <Alert.Link
-                                    href={"https://github.com/open-algebra/Oasis/issues/new/choose"}>file an
-                                    issue</Alert.Link>!</Alert>
+                            <div>
+                                {showInDevWarning &&
+                                    <Alert variant={"warning"} onClose={() => setShowInDevWarning(false)} dismissible>Oasis,
+                                        OasisC, and Oasis Web are still under active development.
+                                        Here be dragons. If something does not work, please feel free to <Alert.Link
+                                            href={"https://github.com/open-algebra/Oasis/issues/new/choose"}>file an
+                                            issue</Alert.Link>!</Alert>}
+                                {showCookieDisclosure &&
+                                    <Alert variant={"light"} onClose={() => setShowCookieDisclosure(false)} dismissible>
+                                        We use Microsoft Clarity, which uses cookies, to better understand how you use
+                                        this website. For more information, see the <Alert.Link
+                                        href={"https://privacy.microsoft.com/privacystatement"}>Microsoft Privacy
+                                        Statement</Alert.Link>.
+                                    </Alert>}
+                            </div>
                             {appState.history.map(({query, response, error}, index) => (
-                                <Stack gap={3} key={index}>
+                                <Stack gap={2} key={index}>
                                     <div className={"align-self-end bg-primary-subtle rounded-5 p-3"}>
                                         <math display={"block"}
                                               dangerouslySetInnerHTML={{__html: query}}></math>
@@ -180,9 +193,12 @@ function App() {
                     <Container className={"my-3"}>
                         <Stack gap={2}>
                             <Stack direction={"horizontal"} gap={2}>
-                                <Button variant={"light"} className={"border"} onClick={() => setShowDerivativeBuilder(true)}>Derivative</Button>
-                                <Button variant={"light"} className={"border"} onClick={() => setShowIntegralBuilder(true)}>Integral</Button>
-                                <Button variant={"light"} className={"border"} onClick={() => setShowLogBuilder(true)}>Logarithm</Button>
+                                <Button variant={"light"} className={"border"}
+                                        onClick={() => setShowDerivativeBuilder(true)}>Derivative</Button>
+                                <Button variant={"light"} className={"border"}
+                                        onClick={() => setShowIntegralBuilder(true)}>Integral</Button>
+                                <Button variant={"light"} className={"border"}
+                                        onClick={() => setShowLogBuilder(true)}>Logarithm</Button>
                             </Stack>
                             <Form onSubmit={onSubmit}>
                                 <InputGroup hasValidation>

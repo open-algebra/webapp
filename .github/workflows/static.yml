@@ -66,6 +66,8 @@ jobs:
         run: npm install
       - name: Build and deploy
         run: npm run build
+        env:
+          VITE_CLARITY_PROJECT_ID: ${{ secrets.VITE_CLARITY_PROJECT_ID }}
         
       - name: Setup Pages
         uses: actions/configure-pages@v5
