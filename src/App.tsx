@@ -83,6 +83,50 @@ function App() {
         addToHistory(queryStr, resultStr);
     }
 
+    function downloadXML() {
+
+        const xmlDoc = document.implementation.createDocument(null, "root");
+        const domParser = new window.DOMParser();
+
+        for (const {query, response, error} of appState.history) {
+            const entryElem = xmlDoc.createElement("Entry");
+
+            const queryElem = xmlDoc.createElement("Query");
+
+            const queryMathElem = xmlDoc.createElement("math");
+            queryMathElem.setAttribute("display", "block");
+
+            const queryElemContent = domParser.parseFromString(query, 'text/xml');
+            queryMathElem.appendChild(queryElemContent.documentElement.cloneNode(true));
+
+            queryElem.appendChild(queryMathElem);
+
+            const responseElem = xmlDoc.createElement(error ? "Error" : "Response")
+            if (error) {
+                responseElem.textContent = response;
+            } else {
+                const responseMathElem = xmlDoc.createElement("math");
+                responseMathElem.setAttribute("display", "block");
+
+                const responseElemContent = domParser.parseFromString(response, 'text/xml');
+                responseMathElem.appendChild(responseElemContent.documentElement.cloneNode(true));
+
+                responseElem.appendChild(responseMathElem);
+            }
+
+            entryElem.appendChild(queryElem);
+            entryElem.appendChild(responseElem);
+            xmlDoc.documentElement.appendChild(entryElem);
+        }
+
+        const serializer = new XMLSerializer();
+        const xmlString = serializer.serializeToString(xmlDoc);
+
+        const blob = new Blob([xmlString], { type: "text/xml" });
+        const url = URL.createObjectURL(blob);
+        window.open(url);
+    }
+
     useEffect(() => {
         async function loadOasis() {
             const module = await import('./OasisC.mjs')
@@ -199,6 +243,8 @@ function App() {
                                         onClick={() => setShowIntegralBuilder(true)}>Integral</Button>
                                 <Button variant={"light"} className={"border"}
                                         onClick={() => setShowLogBuilder(true)}>Logarithm</Button>
+                                <Button variant={"light"} className={"border"}
+                                        onClick={downloadXML}>Download as XML</Button>
                             </Stack>
                             <Form onSubmit={onSubmit}>
                                 <InputGroup hasValidation>
