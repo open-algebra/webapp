@@ -155,7 +155,10 @@ function App() {
 
     if (!oasis) {
         return (
-            <Spinner/>
+            <Stack className={"align-items-center justify-content-center vh-100"} gap={2}>
+                <h1 className={"mx-3"}>Hold on! Paradise is on its way!</h1>
+                <Spinner/>
+            </Stack>
         )
     }
 
