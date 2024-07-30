@@ -225,7 +225,7 @@ function App() {
                     <h1>Open Algebra Software for Inferring Solutions</h1>
                     <p className={"lead"}>Web Edition</p>
                 </Container>
-                <div className={"flex-grow-1 py-3"}>
+                <div className={"flex-grow-1 pb-3"}>
                     <Container>
                         <Stack gap={3}>
                             <div>
