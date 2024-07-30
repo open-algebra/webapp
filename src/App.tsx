@@ -1,5 +1,17 @@
 import './App.css'
-import {Alert, Button, Container, Form, InputGroup, Modal, Spinner, Stack} from "react-bootstrap";
+import {
+    Alert,
+    Button,
+    Container,
+    Form,
+    InputGroup,
+    Modal,
+    Nav,
+    Navbar,
+    NavDropdown,
+    Spinner,
+    Stack
+} from "react-bootstrap";
 import {FormEvent, useEffect, useRef, useState} from "react";
 import FunctionBuilder from "./components/FunctionBuilder.tsx";
 
@@ -179,14 +191,36 @@ function App() {
                 </Modal.Body>
             </Modal>
             <Stack className="min-vh-100">
+                <Navbar expand="lg" className="bg-body" sticky="top">
+                    <Container>
+                        <Navbar.Brand>OASIS Web</Navbar.Brand>
+                        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                        <Navbar.Collapse id="basic-navbar-nav">
+                            <Nav className="me-auto">
+                                <NavDropdown title="File">
+                                    <NavDropdown.Item onClick={downloadXML}>Export as XML</NavDropdown.Item>
+                                </NavDropdown>
+                                <NavDropdown title="Functions">
+                                    <NavDropdown.Item onClick={() => setShowDerivativeBuilder(true)}>Derivative</NavDropdown.Item>
+                                    <NavDropdown.Item onClick={() => setShowIntegralBuilder(true)}>Integral</NavDropdown.Item>
+                                    <NavDropdown.Item onClick={() => setShowLogBuilder(true)}>Logarithm</NavDropdown.Item>
+                                </NavDropdown>
+                                <NavDropdown title="Help">
+                                    <NavDropdown.Item onClick={() => setShowHelp(true)}>Get Started</NavDropdown.Item>
+                                    <NavDropdown.Item href="https://github.com/open-algebra/Oasis/issues/new/choose">File an Issue</NavDropdown.Item>
+                                    <NavDropdown.Divider />
+                                    <NavDropdown.Header>GitHub Repositories</NavDropdown.Header>
+                                    <NavDropdown.Item href="https://github.com/open-algebra/Oasis">Oasis</NavDropdown.Item>
+                                    <NavDropdown.Item href="https://github.com/open-algebra/OasisC">OasisC</NavDropdown.Item>
+                                    <NavDropdown.Item href="https://github.com/open-algebra/webapp">Oasis Web</NavDropdown.Item>
+                                </NavDropdown>
+                            </Nav>
+                        </Navbar.Collapse>
+                    </Container>
+                </Navbar>
                 <Container fluid className="text-center py-3">
-                    <h1 className={"fw-semibold"}>OASIS Web</h1>
-                    <p className={"lead"}>Open Algebra Software for Inferring Solutions</p>
-                    <Stack direction="horizontal" gap={2} className="justify-content-center">
-                        <a href={"https://github.com/open-algebra/Oasis"} className={"btn btn-dark"}>GitHub</a>
-                        <Button variant={"light"} onClick={() => setShowHelp(true)}
-                                className={"border"}>Help</Button>
-                    </Stack>
+                    <h1>Open Algebra Software for Inferring Solutions</h1>
+                    <p className={"lead"}>Web Edition</p>
                 </Container>
                 <div className={"flex-grow-1 py-3"}>
                     <Container>
@@ -235,35 +269,23 @@ function App() {
                 </div>
                 <div className={"bg-body shadow sticky-bottom"}>
                     <Container className={"my-3"}>
-                        <Stack gap={2}>
-                            <Stack direction={"horizontal"} gap={2}>
-                                <Button variant={"light"} className={"border"}
-                                        onClick={() => setShowDerivativeBuilder(true)}>Derivative</Button>
-                                <Button variant={"light"} className={"border"}
-                                        onClick={() => setShowIntegralBuilder(true)}>Integral</Button>
-                                <Button variant={"light"} className={"border"}
-                                        onClick={() => setShowLogBuilder(true)}>Logarithm</Button>
-                                <Button variant={"light"} className={"border"}
-                                        onClick={downloadXML}>Download as XML</Button>
-                            </Stack>
-                            <Form onSubmit={onSubmit}>
-                                <InputGroup hasValidation>
-                                    <Form.Control
-                                        ref={inputRef}
-                                        placeholder="Enter an expression..."
-                                        isInvalid={appState.currentEntry === 0 && !!inputRef.current?.value}
-                                        onChange={parseInput}
-                                    />
-                                    <Button
-                                        variant="primary"
-                                        type={"submit"}
-                                        disabled={!appState.currentEntry}
-                                    >Submit</Button>
-                                    <Form.Control.Feedback type={"invalid"}>Failed to parse
-                                        expression</Form.Control.Feedback>
-                                </InputGroup>
-                            </Form>
-                        </Stack>
+                        <Form onSubmit={onSubmit}>
+                            <InputGroup hasValidation>
+                                <Form.Control
+                                    ref={inputRef}
+                                    placeholder="Enter an expression..."
+                                    isInvalid={appState.currentEntry === 0 && !!inputRef.current?.value}
+                                    onChange={parseInput}
+                                />
+                                <Button
+                                    variant="primary"
+                                    type={"submit"}
+                                    disabled={!appState.currentEntry}
+                                >Submit</Button>
+                                <Form.Control.Feedback type={"invalid"}>Failed to parse
+                                    expression</Form.Control.Feedback>
+                            </InputGroup>
+                        </Form>
                     </Container>
                 </div>
             </Stack>
