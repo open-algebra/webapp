@@ -201,15 +201,15 @@ function App() {
                         <Navbar.Collapse id="basic-navbar-nav">
                             <Nav className="me-auto">
                                 <NavDropdown title="File">
-                                    <NavDropdown.Item onClick={downloadXML}>Export as XML</NavDropdown.Item>
+                                    <NavDropdown.Item as={"button"} onClick={downloadXML}>Export as XML</NavDropdown.Item>
                                 </NavDropdown>
                                 <NavDropdown title="Functions">
-                                    <NavDropdown.Item onClick={() => setShowDerivativeBuilder(true)}>Derivative</NavDropdown.Item>
-                                    <NavDropdown.Item onClick={() => setShowIntegralBuilder(true)}>Integral</NavDropdown.Item>
-                                    <NavDropdown.Item onClick={() => setShowLogBuilder(true)}>Logarithm</NavDropdown.Item>
+                                    <NavDropdown.Item as={"button"} onClick={() => setShowDerivativeBuilder(true)}>Derivative</NavDropdown.Item>
+                                    <NavDropdown.Item as={"button"} onClick={() => setShowIntegralBuilder(true)}>Integral</NavDropdown.Item>
+                                    <NavDropdown.Item as={"button"} onClick={() => setShowLogBuilder(true)}>Logarithm</NavDropdown.Item>
                                 </NavDropdown>
                                 <NavDropdown title="Help">
-                                    <NavDropdown.Item onClick={() => setShowHelp(true)}>Get Started</NavDropdown.Item>
+                                    <NavDropdown.Item as={"button"} onClick={() => setShowHelp(true)}>Get Started</NavDropdown.Item>
                                     <NavDropdown.Item href="https://github.com/open-algebra/Oasis/issues/new/choose">File an Issue</NavDropdown.Item>
                                     <NavDropdown.Divider />
                                     <NavDropdown.Header>GitHub Repositories</NavDropdown.Header>
